@@ -1,12 +1,6 @@
-FROM openjdk:8-jdk
+FROM jenkins/jnlp-slave:3.35-5
 
-ARG user=jenkins
-ARG group=jenkins
-ARG uid=1000
-ARG gid=1000
-
-RUN groupadd -g ${gid} ${group} && \
-    useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
+USER root
 
 # install docker
 RUN mkdir -p /tmp/download && \
@@ -17,4 +11,9 @@ RUN mkdir -p /tmp/download && \
     groupadd -g 999 docker && \
     usermod -aG staff,docker jenkins
 
-VOLUME /var/jenkins_home
+# install kubectl
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/linux/amd64/kubectl && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/kubectl
+
+USER jenkins
